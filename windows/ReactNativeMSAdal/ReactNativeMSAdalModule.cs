@@ -15,7 +15,6 @@ namespace ReactNativeMSAdal
         public ReactNativeMSAdalModule(ReactContext reactContext)
             : base(reactContext)
         {
-            JWT.JsonWebToken.JsonSerializer = new JsonNetSerializer();
         }
 
         public override string Name
