@@ -1,9 +1,6 @@
 ﻿using ReactNative.Modules.Core;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ReactNative.Bridge;
 using ReactNative.UIManager;
 

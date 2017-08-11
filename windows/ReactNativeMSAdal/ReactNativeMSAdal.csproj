@@ -108,6 +108,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticationResult.cs" />
+    <Compile Include="BaseResults.cs" />
+    <Compile Include="JsonNetSerializer.cs" />
     <Compile Include="ReactNativeMSAdalModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReactNativeMSAdalPackage.cs" />
