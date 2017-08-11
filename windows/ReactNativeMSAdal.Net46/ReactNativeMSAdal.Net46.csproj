@@ -71,6 +71,8 @@
       <SubType>Code</SubType>
     </Compile>
     <AppDesigner Include="Properties\" />
+    <Compile Include="ReactNativeMSAdalModule.cs" />
+    <Compile Include="ReactNativeMSAdalPackage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\react-native-windows\ReactWindows\ReactNative.Net46\ReactNative.Net46.csproj">

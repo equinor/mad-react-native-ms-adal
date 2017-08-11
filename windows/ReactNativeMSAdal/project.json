@@ -1,6 +1,5 @@
 ﻿{
   "dependencies": {
-    "Microsoft.IdentityModel.Clients.ActiveDirectory": "3.16.0",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.1.0"
   },
   "frameworks": {

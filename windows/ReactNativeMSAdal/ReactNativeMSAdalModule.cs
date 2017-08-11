@@ -1,8 +1,11 @@
 ﻿using ReactNative.Bridge;
 using System;
 using System.Linq;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
+// using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System.Collections.Generic;
+using Windows.Security.Authentication.Web.Core;
+using Windows.Security.Credentials;
+using System.Threading.Tasks;
 
 namespace ReactNativeMSAdal
 {
@@ -12,28 +15,19 @@ namespace ReactNativeMSAdal
         public ReactNativeMSAdalModule(ReactContext reactContext)
             : base(reactContext)
         {
-            _platformParameters = new PlatformParameters(PromptBehavior.Auto, false);
         }
 
-        private IPlatformParameters _platformParameters;
-
-        private Dictionary<string, AuthenticationContext> contexts = new Dictionary<string, AuthenticationContext>();
-
-        private AuthenticationContext currentContext = null;
-
-        public override string Name
+        async private Task<WebAccountProvider> getOrCreateContext(string authority)
         {
-            get
-            {
-                return "RNAdalPlugin";
-            }
+            return await WebAuthenticationCoreManager.FindAccountProviderAsync(authority);
         }
 
         [ReactMethod]
-        public void createAsync(string authority, bool validateAuthority, IPromise promise) {
+        async public void createAsync(string authority, bool validateAuthority, IPromise promise)
+        {
             try
             {
-                getOrCreateContext(authority, validateAuthority);
+                await getOrCreateContext(authority);
             }
             catch (Exception ex)
             {
@@ -54,43 +48,41 @@ namespace ReactNativeMSAdal
           string extraQueryParams,
           IPromise promise)
         {
-            AuthenticationContext authContext;
+            WebAccountProvider authContext;
             try
             {
-                authContext = getOrCreateContext(authority, validateAuthority);
+                authContext = await getOrCreateContext(authority);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 promise.Reject(ex);
                 return;
             }
 
-            if (userId != null) {
-                TokenCache cache = authContext.TokenCache;
+            WebTokenRequest wtr = new WebTokenRequest(authContext, string.Empty, clientId);
 
-                List<TokenCacheItem> tokensForUserId = cache
-                    .ReadItems()
-                    .Where(item => item.DisplayableId.Equals(userId, StringComparison.CurrentCulture);
 
-                if (tokensForUserId.Any())
+            WebTokenRequestResult wtrr = await WebAuthenticationCoreManager.RequestTokenAsync(wtr);
+            WebAccount userAccount;
+            if (wtrr.ResponseStatus == WebTokenRequestStatus.Success)
+            {
+                WebTokenResponse response = wtrr.ResponseData[0];
+                userAccount = response.WebAccount;
+                AuthenticationResult result = new AuthenticationResult(response.Token, DateTimeOffset.UtcNow)
                 {
-                    userId = tokensForUserId.First().DisplayableId;
-                }
-            }
+                    UserInfo = new UserInfo
+                    {
+                        UniqueId = response.WebAccount.Id,
+                        UserId = response.WebAccount.Id,
+                    }
+                };
 
-            AuthenticationResult result = await authContext.AcquireTokenAsync(
-                resourceUrl,
-                clientId,
-                new Uri(redirectUrl),
-                _platformParameters,
-                new UserIdentifier(userId, UserIdentifierType.OptionalDisplayableId),
-                extraQueryParams);
-
-            promise.Resolve(result);
+                promise.Resolve(result);
+            }           
         }
 
         [ReactMethod]
-        async public void  acquireTokenSilentAsync(
+        public void acquireTokenSilentAsync(
           String authority,
           bool validateAuthority,
           String resourceUrl,
@@ -98,23 +90,7 @@ namespace ReactNativeMSAdal
           String userId,
           IPromise promise)
         {
-            AuthenticationContext authContext;
-            try
-            {
-                authContext = getOrCreateContext(authority, validateAuthority);
-            }
-            catch (Exception ex)
-            {
-                promise.Reject(ex);
-                return;
-            }
-            AuthenticationResult result = await authContext.AcquireTokenSilentAsync(
-                resourceUrl, 
-                clientId, 
-                new UserIdentifier(userId, UserIdentifierType.OptionalDisplayableId), 
-                _platformParameters);
-
-            promise.Resolve(result);
+            promise.Reject(new NotImplementedException());
         }
 
         [ReactMethod]
@@ -142,33 +118,27 @@ namespace ReactNativeMSAdal
             promise.Reject(new NotImplementedException());
         }
 
-        private AuthenticationContext getOrCreateContext(String authority, bool validateAuthority) {
-
-            AuthenticationContext result;
-            if (!contexts.ContainsKey(authority)) {
-                result = new AuthenticationContext(authority, validateAuthority);
-                this.contexts.Add(authority, result);
-            } else {
-                result = contexts[authority];
+        public override string Name
+        {
+            get
+            {
+                return "RNAdalPlugin";
             }
-        
-            // Last asked for context
-            currentContext = result;
-            return result;
         }
 
         public void OnDestroy()
         {
-            currentContext = null;
-            contexts.Clear();
+            throw new NotImplementedException();
         }
 
         public void OnResume()
         {
+            throw new NotImplementedException();
         }
 
         public void OnSuspend()
         {
+            throw new NotImplementedException();
         }
     }
 }
