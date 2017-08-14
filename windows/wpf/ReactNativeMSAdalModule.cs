@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using System.Windows;
 
 namespace ReactNativeMSAdal
 {
@@ -13,7 +14,7 @@ namespace ReactNativeMSAdal
         public ReactNativeMSAdalModule(ReactContext reactContext)
             : base(reactContext)
         {
-            _platformParameters = new PlatformParameters(PromptBehavior.Auto, false);
+            _platformParameters = new PlatformParameters(PromptBehavior.Auto);
         }
 
         private IPlatformParameters _platformParameters;
@@ -81,15 +82,31 @@ namespace ReactNativeMSAdal
                 }
             }
 
-            AuthenticationResult result = await authContext.AcquireTokenAsync(
-                resourceUrl,
-                clientId,
-                new Uri(redirectUrl),
-                _platformParameters,
-                new UserIdentifier(userId, UserIdentifierType.OptionalDisplayableId),
-                extraQueryParams);
+            try
+            {
+                UserIdentifier user = UserIdentifier.AnyUser;
+                if (userId != null)
+                {
+                    user = new UserIdentifier(userId, UserIdentifierType.OptionalDisplayableId);
+                }
 
-            promise.Resolve(result);
+                AuthenticationResult result = await authContext.AcquireTokenAsync(
+                    resourceUrl,
+                    clientId,
+                    new Uri(redirectUrl),
+                    _platformParameters,
+                    user,
+                    extraQueryParams);
+
+                promise.Resolve(result);
+            }
+            catch (Exception ex)
+            {
+                promise.Reject(ex);
+                return;
+            }
+            
+;
         }
 
         [ReactMethod]
@@ -111,13 +128,26 @@ namespace ReactNativeMSAdal
                 promise.Reject(ex);
                 return;
             }
-            AuthenticationResult result = await authContext.AcquireTokenSilentAsync(
-                resourceUrl,
-                clientId,
-                new UserIdentifier(userId, UserIdentifierType.OptionalDisplayableId),
-                _platformParameters);
+            try
+            {
+                UserIdentifier user = UserIdentifier.AnyUser;
+                if (userId != null)
+                {
+                    user = new UserIdentifier(userId, UserIdentifierType.OptionalDisplayableId);
+                }
+                AuthenticationResult result = await authContext.AcquireTokenSilentAsync(
+                    resourceUrl,
+                    clientId,
+                    user,
+                    _platformParameters);
 
-            promise.Resolve(result);
+                promise.Resolve(result);
+            }
+            catch (Exception ex)
+            {
+                promise.Reject(ex);
+                return;
+            }
         }
 
         [ReactMethod]

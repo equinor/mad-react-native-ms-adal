@@ -12,8 +12,7 @@ namespace ReactNativeMSAdal
             SetProperty<String>(props, "given_name", val => { this.GivenName = val; });
             SetProperty<String>(props, "family_name", val => { this.FamilyName = val; });
             SetProperty<String>(props, "idp", val => { this.IdentityProvider = val; });
-
-
+            
             SetProperty<String>(props, "oid", val => { this._oid = val; });
             SetProperty<String>(props, "upn", val => { this._upn = val; });
             SetProperty<String>(props, "sup", val => { this._sup = val; });
@@ -32,7 +31,12 @@ namespace ReactNativeMSAdal
         }
 
         [JsonProperty(PropertyName = "displayableId")]
-        public string DisplayableId { get; internal set; }
+        public string DisplayableId {
+            get
+            {
+                return _upn;
+            }
+        }
 
         [JsonProperty(PropertyName = "givenName")]
         public string GivenName { get; internal set; }
