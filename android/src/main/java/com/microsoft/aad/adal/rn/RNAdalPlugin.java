@@ -245,7 +245,7 @@ public class RNAdalPlugin extends ReactContextBaseJavaModule {
     }
 
     String key = CacheKey.createCacheKey(itemAuthority, resourceId, clientId, isMultipleResourceRefreshToken, userId, null);
-    authContext.getCache().removeItem(key);
+    authContext.getCache().removeAll();
 
     promise.resolve(true);
     //callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
