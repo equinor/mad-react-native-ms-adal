@@ -283,6 +283,7 @@ RCT_REMAP_METHOD(tokenCacheDeleteItem,
                  resourceId:(NSString *)resourceId
                  clientId:(NSString *)clientId
                  userId:(NSString *)userId
+                 isMultipleResourceRefreshToken:(BOOL)isMultipleResourceRefreshToken
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject )
 

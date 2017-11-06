@@ -58,7 +58,8 @@ TokenCache.prototype.deleteItem = function (item) {
         item.authority,
         item.resource,
         item.clientId,
-        item.userInfo && item.userInfo.userId
+        item.userInfo && item.userInfo.userId,
+        item.isMultipleResourceRefreshToken,
     );
 };
 
